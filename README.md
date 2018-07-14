@@ -5,7 +5,7 @@ After trying many methods of updating the now playing info on our player and get
 
 Turns out that if you add an extra header when you connect to the server you can make it send you a different stream which is made up of the mp3 and the metadata spliced together. The problem is that your browser won't play it, as it's not a proper mp3.
 
-This is a simple service worker which will intercept network requests from any html audio elements on your page and add the header to a fetch request to retrieve the metadata stream fro your server.
+This is a simple service worker which will intercept network requests from any html audio elements on your page and add the header to a fetch request to retrieve the metadata stream from your server.
 
 It then handles the response, splitting the metadata and the mp3 data and returns the mp3 data as a readable stream to your audio element and posts a message containing the metadata to your main window.
 
