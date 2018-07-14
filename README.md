@@ -12,3 +12,5 @@ It then handles the response, splitting the metadata and the mp3 data and return
 The header needed to make the server output the metadata stream is only available under the same origin, this is a limitation of the fetch api so if your web server is on a different domain to your streaming server you'll have to come up with your own workaround for that.
 
 Simply register the service worker on the page your player is on and it should start doing it's thing. You just need an event handler for messages from the worker to do something with the metadata.
+
+Simple demo at https://toohotradio.net/metadata.html
