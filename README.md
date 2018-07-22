@@ -13,17 +13,21 @@ The header needed to make the server output the metadata stream is only availabl
 
 Simply register the service worker on the page your player is on and it should start doing it's thing.
 
-`navigator.serviceWorker.register('worker.min.js')`
+```
+navigator.serviceWorker.register('worker.min.js')
+```
 
 You just need an event handler for messages from the worker to do something with the metadata.
 
-`navigator.serviceWorker.addEventListener('message', event => {
+```
+navigator.serviceWorker.addEventListener('message', event => {
     if(event.origin != 'https://example.com'){
         return;
     }
     var meta = event.data.msg;
     meta = meta.substring(meta.indexOf("'") + 1,meta.lastIndexOf("'"));
     document.querySelector('div').innerText = meta;
-});`
+});
+```
 
 Simple demo at https://toohotradio.net/metadata/
