@@ -1,14 +1,17 @@
+const playerOrigin = 'https://example.com';
 let fetchController;
+let fetchSignal = null;
 self.addEventListener('fetch', event => {
+    console.log(event);
     if (event.request.destination != 'audio') {
         return
     }
-    fetchController = new AbortController();
     let Heads = new Headers({"Icy-Metadata": "1"});
-    const signal = fetchController.signal;
     let stream = new ReadableStream({
         start(controller) {
             let songs = Array();
+            fetchController = new AbortController();
+            let signal = fetchController.signal;
             let decoder = new TextDecoder();
             let startFetch = fetch(event.request.url, {signal,headers: Heads});
             function pushStream(response) {
@@ -33,9 +36,8 @@ self.addEventListener('fetch', event => {
                                     });
                                 });
                             }
-                            if(fetchController == 1)
-                            {controller.close();
-                             fetchController = 0;}
+                            if(fetchSignal == 1)
+                            {fetchController.abort();}
                             controller.enqueue(musicData);
                         }
                     }
@@ -44,7 +46,12 @@ self.addEventListener('fetch', event => {
             }
             startFetch
                 .then(response => pushStream(response))
-                .then(() => controller.close());
+                .then(() => controller.close())
+                .catch(function(e) {
+                    console.log('Connection to stream cancelled');
+                    fetchSignal = 0;
+                    sendMsg('Dropped connection');
+                });
         }
     });
     event.respondWith(new Response(stream, {
@@ -58,8 +65,17 @@ self.addEventListener('activate', event => {
     clients.claim();
 });
 self.addEventListener('message', event => {
-    if(event.origin != 'https://example.com'){
+    if(event.origin != playerOrigin){
         return;
     }
-    fetchController = 1;
+    fetchSignal = 1;
 });
+function sendMsg(msg){
+    self.clients.matchAll().then(function (clients){
+        clients.forEach(function(client){
+            client.postMessage({
+                msg: msg
+            });
+        });
+    });
+}
